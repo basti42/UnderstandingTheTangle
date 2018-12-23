@@ -12,9 +12,11 @@ class Tangle:
         """
         self.genesisTransaction = Transaction("Everyone", "", 1000)
         self.genesis = TangleNode(self.genesisTransaction)
+        self.genesis.isValidated = True
         self.totalNumberOfNodes = 1      # count the number of nodes in the DAG
         self.nodes = [self.genesis]      # keeps track of nodes, that are not validated yet
         self.validatedNodes = []
+        self.transactions = {}
 
     def addNode(self, transaction):
         """
@@ -24,6 +26,8 @@ class Tangle:
         to check their hashes.
         """
         newNode = TangleNode(transaction)
+
+        self.handleTransaction(transaction)
 
         if len(self.nodes) >= 2: # there are enough nodes to collect two
             oneIdx = np.random.choice(np.arange(0,len(self.nodes)))
@@ -55,6 +59,29 @@ class Tangle:
         # add the new node to the nodes list
         self.nodes.append(newNode)
         self.totalNumberOfNodes += 1
+
+    def handleTransaction(self, transaction):
+        """
+        keep track of the transactions in one big dict
+        :param  transaction :   Transaction
+        """
+        s = transaction.sender
+        r = transaction.recipient
+        a = transaction.amount
+        # sender in transaction list
+        if s not in self.transactions:
+            self.transactions[s] = {'Balance': -a, 'From':[], 'To':[r]}
+        else:
+            self.transactions[s]['Balance'] -= a
+            self.transactions[s]['To'].append(r)
+
+        # recipient in transaction list
+        if r not in self.transactions:
+            self.transactions[r] = {'Balance': a, 'From':[s], 'To':[]}
+        else:
+            self.transactions[r]['Balance'] += a
+            self.transactions[r]['From'].append(s)
+
 
     def __repr__(self):
         return "[Total Nodes: {:4d} (Non-validated: {:4d} - Validated: {:4d})]".format(

@@ -16,7 +16,7 @@ abc = list(ascii_uppercase)
 # tracking
 x, validated, nonvalidated = [], [], []
 
-number = 25000
+number = 500
 print("Making a Tangle with {} nodes".format(number))
 for i in range(number):
 
@@ -50,3 +50,7 @@ plt.grid()
 plt.xlabel("total number of nodes")
 plt.ylabel("validated / non-validated")
 plt.show()
+
+
+# for k,v in tangle.transactions.items():
+#     print(k,v)
